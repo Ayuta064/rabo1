@@ -7,9 +7,9 @@ using System.Collections.Generic;
 // 1. データ構造の定義（Firestoreの中身と合わせる）
 public class StepData
 {
-    public string Instruction;
-    public string SpiceID;
-    public string VideoUrl;
+    public string instruction;
+    public string spiceID;
+    public string video;
 }
 
 public class RecipeViewer : MonoBehaviour
@@ -23,7 +23,7 @@ public class RecipeViewer : MonoBehaviour
 
     [Header("Database Settings")]
     [Tooltip("取得したいレシピのドキュメントID (例: omlet_cheese)")]
-    public string targetRecipeID = "omlet_cheese";
+    public string targetRecipeID = "tz5vBFXPEGdxJaAvZPYG";
 
     // 内部データ
     private List<StepData> steps = new List<StepData>();
@@ -32,10 +32,24 @@ public class RecipeViewer : MonoBehaviour
 
     void Start()
     {
-        // 初期化とロード開始
-        instructionText.text = "レシピを読み込み中...";
-        db = FirebaseFirestore.DefaultInstance;
-        LoadRecipeFromFirestore();
+        instructionText.text = "Firebase初期化中...";
+
+        // Firebaseの依存関係をチェック
+        Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
+            var dependencyStatus = task.Result;
+            if (dependencyStatus == Firebase.DependencyStatus.Available)
+            {
+                // 初期化成功！ここで初めてデータベースに接続
+                db = FirebaseFirestore.DefaultInstance;
+                instructionText.text = "レシピを読み込み中...";
+                LoadRecipeFromFirestore();
+            }
+            else
+            {
+                Debug.LogError($"Firebaseの初期化に失敗: {dependencyStatus}");
+                instructionText.text = "初期化エラー";
+            }
+        });
     }
 
     // ---------------------------------------------------------
@@ -85,9 +99,9 @@ public class RecipeViewer : MonoBehaviour
             var map = item as Dictionary<string, object>;
             
             StepData newStep = new StepData();
-            newStep.Instruction = map.ContainsKey("instruction") ? map["instruction"].ToString() : "";
-            newStep.SpiceID = map.ContainsKey("spiceID") ? map["spiceID"].ToString() : "";
-            newStep.VideoUrl = map.ContainsKey("video") ? map["video"].ToString() : "";
+            newStep.instruction = map.ContainsKey("instruction") ? map["instruction"].ToString() : "";
+            newStep.spiceID = map.ContainsKey("spiceID") ? map["spiceID"].ToString() : "";
+            newStep.video = map.ContainsKey("video") ? map["video"].ToString() : "";
             
             steps.Add(newStep);
         }
@@ -127,7 +141,7 @@ public class RecipeViewer : MonoBehaviour
         StepData currentStep = steps[currentIndex];
 
         // テキストの更新
-        instructionText.text = currentStep.Instruction;
+        instructionText.text = currentStep.instruction;
         
         // カウンターの更新 (例: 1 / 5)
         if (counterText != null)
@@ -138,6 +152,6 @@ public class RecipeViewer : MonoBehaviour
         // 🚨 ここに将来的に「ハイライト機能」や「動画再生」を追加します
         // if (!string.IsNullOrEmpty(currentStep.SpiceID)) { ... }
         
-        Debug.Log($"ステップ {currentIndex + 1}: {currentStep.Instruction}");
+        Debug.Log($"ステップ {currentIndex + 1}: {currentStep.instruction}");
     }
 }
