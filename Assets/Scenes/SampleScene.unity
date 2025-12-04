@@ -266,8 +266,8 @@ MonoBehaviour:
   maintainScaleOnInitialization: 1
   smoothing: 1
   lifetime: 0
-  orientationType: 1
-  localOffset: {x: 0.035, y: 0.28, z: 0.8}
+  orientationType: 5
+  localOffset: {x: 0.15, y: 0.03, z: 0.5}
   worldOffset: {x: 0, y: 0, z: 0}
   useAngleStepping: 0
   tetherAngleSteps: 6
@@ -300,7 +300,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 260175442}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.515, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1662,7 +1662,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6264478733034656631, guid: c2a4036cbd244524d828230f1bf7c12c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6264478733034656631, guid: c2a4036cbd244524d828230f1bf7c12c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2361,8 +2361,8 @@ MonoBehaviour:
   maintainScaleOnInitialization: 1
   smoothing: 1
   lifetime: 0
-  orientationType: 1
-  localOffset: {x: 0, y: -0.05, z: 0.2}
+  orientationType: 5
+  localOffset: {x: -0.07, y: -0.1, z: 0.4}
   worldOffset: {x: 0, y: 0, z: 0}
   useAngleStepping: 0
   tetherAngleSteps: 6
@@ -3299,8 +3299,8 @@ MonoBehaviour:
   maintainScaleOnInitialization: 1
   smoothing: 1
   lifetime: 0
-  orientationType: 1
-  localOffset: {x: 0.4, y: 0, z: 1}
+  orientationType: 5
+  localOffset: {x: 0.09, y: -0.05, z: 0.5}
   worldOffset: {x: 0, y: 0, z: 0}
   useAngleStepping: 0
   tetherAngleSteps: 6
@@ -3396,8 +3396,8 @@ RectTransform:
   m_GameObject: {fileID: 1511394040}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.0004, y: 0.0004, z: 0.0004}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1278533355}
   - {fileID: 1772630926}
@@ -3408,7 +3408,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.515}
+  m_AnchoredPosition: {x: -0.335, y: 0.515}
   m_SizeDelta: {x: 400, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1511394047
@@ -4109,6 +4109,8 @@ GameObject:
   - component: {fileID: 1819267154}
   - component: {fileID: 1819267153}
   - component: {fileID: 1819267152}
+  - component: {fileID: 1819267158}
+  - component: {fileID: 1819267157}
   m_Layer: 5
   m_Name: video popup
   m_TagString: Untagged
@@ -4212,9 +4214,54 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 467.5, y: 275.5}
+  m_AnchoredPosition: {x: 0, y: 1.624}
   m_SizeDelta: {x: 935, y: 551}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1819267157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819267151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a8e5e857dcf3a84cbd29548d8c79aa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateLinkedTransform: 0
+  moveLerpTime: 0.1
+  rotateLerpTime: 0.1
+  scaleLerpTime: 0
+  maintainScaleOnInitialization: 1
+  smoothing: 1
+  lifetime: 0
+  orientationType: 1
+  localOffset: {x: 0, y: 0.03, z: 0.3}
+  worldOffset: {x: 0, y: 0, z: 0}
+  useAngleStepping: 0
+  tetherAngleSteps: 6
+--- !u!114 &1819267158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819267151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3986155c7a728454f8bbbabd2e274601, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftInteractor: {fileID: 0}
+  rightInteractor: {fileID: 0}
+  trackedTargetType: 0
+  trackedHandedness: 3
+  trackedHandJoint: 0
+  transformOverride: {fileID: 0}
+  additionalOffset: {x: 0, y: 0, z: 0}
+  additionalRotation: {x: 0, y: 0, z: 0}
+  updateSolvers: 1
 --- !u!1 &1966308935 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7776007855708321233, guid: 180d4d2203473be4fa3fef18d0bec80e, type: 3}
@@ -4328,6 +4375,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spiceManager: {fileID: 0}
+  currentStep: 0
+  requiredSeasonings:
+  - "\u5869"
+  - "\u7802\u7CD6"
+  - "\u91A4\u6CB9"
 --- !u!1001 &8145717094810385511
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4373,15 +4425,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8145717094914108627, guid: 19ee1bc6426559043993787ce0bc791a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8145717094914108627, guid: 19ee1bc6426559043993787ce0bc791a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8145717094914108627, guid: 19ee1bc6426559043993787ce0bc791a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8145717094914108627, guid: 19ee1bc6426559043993787ce0bc791a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4433,7 +4485,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8145717094914108627, guid: 19ee1bc6426559043993787ce0bc791a, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8145717094914108629, guid: 19ee1bc6426559043993787ce0bc791a, type: 3}
       propertyPath: m_fontSize
