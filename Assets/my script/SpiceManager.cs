@@ -1,231 +1,140 @@
 using UnityEngine;
-
 using System.Collections.Generic;
-
 using UnityEngine.XR.ARFoundation;
-
-using Microsoft.MixedReality.OpenXR;
-
-using Microsoft.MixedReality.OpenXR.ARSubsystems;  // ARMarkerManager/ARMarker が定義されている可能性のある内部名前空間
-
-//        // Editorフォルダ内の補助的な型を参照するため
-
-// 🚨 QRコードのクラス定義のために、OpenXR関連のusingが必要
-
-
-
-
+using Microsoft.MixedReality.OpenXR;  
+using Microsoft.MixedReality.OpenXR.ARSubsystems;
 
 public class SpiceManager : MonoBehaviour
-
 {
-
-    [Tooltip("シーン内のARマーカーマネージャーコンポーネント (Inspectorで割り当て)")]
-
+    [Tooltip("シーン内のARマーカーマネージャー (Inspectorで割り当て)")]
     public ARMarkerManager MarkerManager;
 
-
-
-    [Tooltip("Inspectorで設定する、すべての調味料のデータリスト")]
-
+    [Tooltip("Inspectorで設定する、すべての調味料データリスト")]
     public List<SpiceData> seasoningList;
 
-
-
     void Start()
-
     {
-
         if (MarkerManager == null)
-
         {
-
-            Debug.LogError("ARMarkerManagerが割り当てられていません。Inspectorを確認してください。");
-
+            Debug.LogError("ARMarkerManager が割り当てられていません。");
             return;
-
         }
 
-        
-
-        // ARマーカーの変更イベントを購読し、OnARMarkersChanged を呼び出す
-
+        // ▼ QRコードのイベント購読
         MarkerManager.markersChanged += OnARMarkersChanged;
 
-
-
-        // 初期状態でハイライトオブジェクトを非表示にしておく
-
+        // ▼ 最初はハイライトを非表示にする
         foreach (var data in seasoningList)
-
         {
-
             if (data.HighlightObject != null)
-
             {
-
                 data.HighlightObject.SetActive(false);
-
             }
-
         }
-
     }
-
-
 
     void OnDestroy()
-
     {
-
         if (MarkerManager != null)
-
         {
-
-            // アプリ終了時にイベントの購読を解除
-
             MarkerManager.markersChanged -= OnARMarkersChanged;
-
         }
-
     }
 
-    
-
-    // ----------------------------------------------------------------
-
-    // 識別とアンカー登録のロジック
-
-    // ----------------------------------------------------------------
-
-
-
-    // ARMarkerManagerから呼び出されるイベントハンドラ
-
+    // ================================================================
+    // QRコードの検出イベント (ログ強化版)
+    // ================================================================
     private void OnARMarkersChanged(ARMarkersChangedEventArgs args)
-
     {
-
-        // 新しく検出されたQRコードを処理
-
+        // 1. 新しく見つかったマーカーをチェック
         foreach (var marker in args.added)
-
         {
-
-            // QRコードにエンコードされたデータ（例: "SALT"）を取得
-
-            string decodedData = marker.GetDecodedString();
-
-            
-
-            // データリスト内で一致する調味料を検索
-
-            SpiceData data = seasoningList.Find(d => d.QrCodeData == decodedData);
-
-
-
-            // データが見つかり、まだアンカーが登録されていなければ処理を実行
-
-            if (data != null && !data.IsAnchorRegistered)
-
-            {
-
-                RegisterAnchorForSpice(marker, data);
-
-            }
-
+            ProcessMarker(marker, "新規発見");
         }
 
-        
-
-        // 追跡を失ったマーカー（args.removed）に対するハイライト解除ロジックも、
-
-        // 必要に応じてこのメソッド内に追加できます。
-
+        // 2. 情報が更新されたマーカーもチェック
+        // (※重要: 最初のフレームではデータが空で、次のフレームで文字が入ることがあるため)
+        foreach (var marker in args.updated)
+        {
+            ProcessMarker(marker, "更新");
+        }
     }
 
-
-
-    private void RegisterAnchorForSpice(ARMarker marker, SpiceData data)
-
+    // マーカー処理の共通メソッド
+    private void ProcessMarker(ARMarker marker, string state)
     {
+        // QRコードの文字列を取得
+        string decodedData = marker.GetDecodedString();
 
-        // 1. マーカーの位置と姿勢を取得
+        // データが空なら「見つけたけどまだ読めてない」とログを出す
+        if (string.IsNullOrEmpty(decodedData))
+        {
+            // Debug.Log($"[{state}] QRコードを認識しましたが、データはまだ空です...");
+            return; 
+        }
 
+        // データが入っていたら、はっきりとログを出す
+        Debug.Log($"👁️‍🗨️ 【{state}】QRコード読み取り成功！ 内容: 「{decodedData}」");
+
+        // ▼ リストから一致する調味料を探す
+        SpiceData data = seasoningList.Find(d => d.QrCodeData == decodedData);
+
+        if (data != null)
+        {
+            Debug.Log($"   ➡ リスト内の調味料「{data.SeasoningName}」と一致しました。");
+
+            // まだアンカー登録されていなければ登録
+            if (!data.IsAnchorRegistered)
+            {
+                RegisterAnchorForSpice(marker, data);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"   ⚠️ リストに登録されていないQRコードです: {decodedData}");
+        }
+    }
+
+    // ================================================================
+    // マーカー位置にアンカーを作成してハイライトを固定
+    // ================================================================
+    private void RegisterAnchorForSpice(ARMarker marker, SpiceData data)
+    {
         Transform markerTransform = marker.transform;
 
-        
-
-        // 2. マーカーの位置にアンカーのルートGameObjectを作成
-
+        // ▼ アンカーのルートオブジェクトを生成
         GameObject anchorRoot = new GameObject($"Anchor_{data.SeasoningName}");
-
         anchorRoot.transform.SetPositionAndRotation(markerTransform.position, markerTransform.rotation);
 
+        // ▼ アンカーを追加（空間に固定）
+        ARAnchor anchor = anchorRoot.AddComponent<ARAnchor>();
 
-
-        // 3. 空間アンカーコンポーネント (ARAnchor) を追加
-
-        //    これにより、マーカーが見えなくなってもホログラムが固定されます。
-
-        ARAnchor anchor = anchorRoot.AddComponent<ARAnchor>(); 
-
-
-
-        // 4. ハイライトオブジェクトをアンカーの子にする
-
+        // ▼ ハイライトをアンカーの子にし、表示開始
         if (data.HighlightObject != null)
-
         {
-
-            // ワールド座標を維持してアンカーの子にする
-
-            data.HighlightObject.transform.SetParent(anchorRoot.transform, true); 
-
+            data.HighlightObject.transform.SetParent(anchorRoot.transform, true);
+            data.HighlightObject.transform.localPosition = Vector3.zero; // 位置ズレ防止のためリセット
+            data.HighlightObject.transform.localRotation = Quaternion.identity;
             data.HighlightObject.SetActive(true);
-
         }
 
-
-
-        // 5. データ構造を更新
-
+        // ▼ 状態更新
         data.IsAnchorRegistered = true;
 
-        Debug.Log($"✅ アンカー登録完了: {data.SeasoningName}");
-
+        Debug.Log($"✅ 【完了】空間アンカーを作成し、{data.SeasoningName} の位置を固定しました。");
     }
 
-
-
-    // ----------------------------------------------------------------
-
-    // レシピとの連携メソッド (ハイライトのオン/オフ)
-
-    // ----------------------------------------------------------------
-
-
-
-    // レシピの工程で呼び出され、ハイライトの表示/非表示を切り替えるメソッド
-
-    // 例: HighlightSeasoning("塩", true) でハイライト表示
-
-    public void HighlightSeasoning(string requiredSeasoningName, bool shouldBeVisible)
-
+    // ================================================================
+    // レシピ工程から呼び出されるハイライトの ON/OFF
+    // ================================================================
+    public void HighlightSeasoning(string requiredSeasoningName, bool show)
     {
-
         SpiceData data = seasoningList.Find(d => d.SeasoningName == requiredSeasoningName);
 
-
-
         if (data != null && data.IsAnchorRegistered && data.HighlightObject != null)
-
         {
-
-            data.HighlightObject.SetActive(shouldBeVisible);
-
+            data.HighlightObject.SetActive(show);
+            Debug.Log($"🔦 ハイライト切り替え: {data.SeasoningName} -> {(show ? "ON" : "OFF")}");
         }
-
     }
-
 }
