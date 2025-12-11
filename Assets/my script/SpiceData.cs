@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using System;
 
 [Serializable]
 public class SpiceData
@@ -14,6 +14,6 @@ public class SpiceData
     public GameObject HighlightObject; 
 
     // アンカーが登録済みであるかを示すフラグ
-    [HideInInspector] // Inspectorに表示しない
+    [HideInInspector]
     public bool IsAnchorRegistered = false; 
 }
